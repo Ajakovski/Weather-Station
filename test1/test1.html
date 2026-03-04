@@ -1,0 +1,57 @@
+<html>
+<head>
+
+    <style>
+
+        
+    </style>
+
+</head>
+<body>
+    <header>
+        <h1>Pametna robotna stanica</h1>
+        <p>Monitoring na temperatura i vlaga - Arduino+DHT11</p>
+    </header>
+    <div class="cards">
+        <div class="card">
+            <div class="label">Temperatura</div>
+            <div class="value" id="temp-value">--</div>
+            <div class="unit">*C</div>
+        </div>
+        <div class="card">
+            <div class="label">Vlaznost</div>
+            <div class="value" id="humid-val">--</div>
+            <div class="unit">%</div>
+        </div>
+    </div>
+    <footer>
+        EKTA natpreavar
+    </footer>
+    <script>
+        const API_URL="save_data.php?action=last";
+        const REFRESH=5000;
+
+        async function fetchData(){
+            try{
+                const res=await fetch(API_URL);
+                const json=await res.json();
+
+                if(json.status!=="ok" || !json.data.length){
+                    setStatus("Nema podatoci",false);
+                    return ;
+                }
+                const rows=json.data;
+                const last=rows[rows.length-1];
+                document.getElementById("temp-val").textContent=parseFloat(last.temperatura).toFixed(1);
+                document.getElementById("humid-val").textContet=parseFloat(last.vlaga);
+            }
+            catch (err){
+                    setStatus("Greska pri povrzuvanje na server", false);
+                    constole.error(err);
+                }
+            fetchData();
+            setInterval(fetchData, REFRESH);
+        }
+    </script>
+</body>
+</html>
