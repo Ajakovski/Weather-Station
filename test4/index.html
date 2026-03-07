@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather station</title>
+    <style>
+        *{box-sizing:border-box;padding:0;margin:0;}
+        body{
+            background: #111111;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: aliceblue;
+            padding:20px;
+            min-height: 100px;
+        }
+        header{
+            text-align: center;
+            color: blanchedalmond;
+            margin-bottom:40px;
+            border-bottom:2px solid #74814f; 
+        }
+        header h1{
+            font-size:2rem;
+            color:aquamarine;
+        }
+        header p{
+            font-size:0.9rem;
+            color:darkgrey;
+            margin-top:10px;
+        }
+        .cards{
+            display:flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap:25px;
+            margin-bottom: 35px;
+        }
+        .card{
+            text-align: center;
+            background: #162236;
+            border: 1px solid #1e3a5f;
+            border-radius: 16px;
+            padding:28px 40px;
+            min-width:300px;
+            transition:box-shadow .3s;
+        }
+
+        #temp-val  { color: #ff7043;  font-size: 2rem; }
+        #humid-val { color: #4fc3f7; font-size: 2rem;  }
+        #time-val  { color: #81c784; font-size: 1.3rem; }
+
+        footer{
+            text-align: center;
+            color: #37474f;
+            margin-top: 40px;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Pametna rabotna stanica</h1>
+        <p>Monitoring na temperatura i vlaga</p>
+    </header>
+    <div class="cards">
+        <div class="card">
+            <div class="label">Temperatura</div>
+            <div class="value" id="temp-val">--</div>
+            <div class="unit">*C</div>
+        </div>
+        <div class="card">
+            <div class="label">Vlaga</div>
+            <div class="value" id="humid-val">--</div>
+            <div class="unit">%</div>
+        </div>
+        <div class="card">
+            <div class="label">Vreme</div>
+            <div class="value" id="time-val">--</div>
+            <div class="unit">Den/cas</div>
+        </div>
+    </div>
+    <footer>Pametna rabotna stanica &mdash; EKTA</footer>
+
+    <script>
+        const API_URL="save_data.php?action=last";
+        const REFRESH=5000;
+
+        function formatDate(datetimeStr){
+            const d=new Date(datetimeStr);
+            return d.toLoacleString("mk-MK");
+        }
+        async function fetchData(){
+            try{const res=await fetch(API_URL);
+            const json=await res.json();
+
+            document.getElemenetById("temp-val").textContent=parseFloat(last.temperatura).toFixed(1);
+            document.getElemenetById("humid-val").textContent=parseFloat(last.vlaga).toFixed(1);
+            document.getElementById("time-val").textContent=formatDate(last.vreme);
+
+            }catch(err){
+                console.error(err);
+            }
+        }
+        fetchData();
+        setInterval(fetchData,REFRESH);
+    </script>
+</body>
+</html>

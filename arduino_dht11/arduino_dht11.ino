@@ -6,7 +6,7 @@
 #include "DHT.h"
 
 #define DHTPIN 2        // DATA пин на DHT11 поврзан на D2
-#define DHTTYPE DHT11   // Тип на сензор: DHT11
+#define DHTTYPE DHT 11   // Тип на сензор: DHT11
 
 DHT dht(DHTPIN, DHTTYPE);
 

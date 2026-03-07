@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Паметна работна станица – Мониторинг</title>
+
+    <style>
+        *{box-sizing:border-box;padding:0px;margin:0px;}
+        body{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f1721;
+            color:aliceblue;
+            padding:20px;
+            min-height:100vh;
+        }
+        header{
+            text-align: center;
+            padding:30px 20px 20px;
+            border-bottom:2px solid navy;
+            margin-bottom:30px;
+        }
+        header h1{
+            font-size:2rem;
+            color: aquamarine;
+        }
+        header p{
+            font-size:0.9rem;
+            color:darkgray;
+            margin-top:6px;
+        }
+
+        .cards{
+            display:flex;
+            justify-content:center;
+            gap:25px;
+            flex-wrap:wrap;
+            margin-bottom:35px;
+        }
+
+        .card{
+            background: #162236;
+            border:1px solid #1e3a5f;
+            border-radius:16px;
+            padding: 28px 40px;
+            text-align:center;
+            min-width:200px;
+            transition:box-shadow .3s;
+        }
+
+        #temp-val{color:orangered;}
+        #humid-val{color:aqua;}
+        #time-val{color:lightgreen; font-size:1.3rem;}
+
+        footer{
+            text-align:center;
+            margin-top:40px;
+            color:#37474f;
+            font-size:0.8rem;
+        }
+    </style>
+
+</head>
+<body>
+    <header>
+        <h1>Паметна работна станица</h1>
+        <p>Мониторинг на температура и влага – Arduino DHT11</p>
+    </header>
+    <div class="cards">
+        <div class="card">
+            <div class="label">Температура</div>
+            <div class="value" id="temp-val">--</div>
+            <div class="unit">*C</div>
+        </div>
+        <div class="card">
+            <div class="label">Влага</div>
+            <div class="value" id="humid-val">--</div>
+            <div class="unit">%</div>
+        </div>
+        <div class="card">
+            <div class="label">Датум</div>
+            <div class="value" id="time-val">--</div>
+            <div class="unit">Ден/час</div>
+        </div>
+    </div>
+    <footer> Паметна работна станица &mdash; Електротехничар за компјутерска техника и автоматика</footer>
+
+    <script>
+        const API_URL="save_data.php?action=last";
+        const REFRESH=5000;
+
+        function formatTime(datetimeStr){
+            const d=new Date(datetimeStr);
+            return d.toLocaleString('mk-MK')
+        }
+        async function fetchData(){
+            try{
+                const res=await fetch(API_URL);
+                const json=await res.json();
+
+                const rows=json.data;
+                const last=rows[rows.length-1];
+
+                document.getElementById("temp-val").textContent=parseFloat(last.temperatura).toFixed(1);
+                document.getElementById("humid-val").textContent=parseFloat(last.vlaga).toFixed(1);
+                document.getElementById("time-val").textContent=formatTime(last.vreme);
+
+            }catch(err){
+                console.error(err);
+            }
+        }
+        fetchData();
+        setInterval(fetchData,REFRESH);
+    </script>
+</body>
+</html>
