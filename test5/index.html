@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Станица</title>
+    <style>
+        
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Станица за температура</h1>
+        <p>Се користи ардуино и дхт11</p>
+    </header>
+    <div class="cards">
+        <div class="card">
+            <div class="label">Температура</div>
+            <div class="value" id="temp-val">--</div>
+            <div class="unit">*C</div>
+        </div>
+        <div class="card">
+            <div class="label">Влага</div>
+            <div class="value" id="humid-val">--</div>
+            <div class="unit">%</div>
+        </div>
+        <div class="card">
+            <div class="label">Време</div>
+            <div class="value" id="time-val">--</div>
+            <div class="unit">Ден/час</div>
+        </div>
+    </div>
+    <footer>Метеролошка станица &mdash; за мерење на температура и влага</footer>
+
+    <script>
+        const API_URL="save_data.php?action=last";
+        const REFRESH_INTERVAL=5000;
+
+        function formatdateTime(datetimeStr){
+            const d=new Date(datetimeStr);
+            return d.toLocaleString("mk-MK", {dateStyle:"short",timeStyle:"medium"});
+        }
+
+        async function fetchData(){
+            try{
+                const res=await fetch(API_URL);
+                const json=await res.json();
+                
+                const rows=json.data;
+                const last=rows[rows.length-1];
+
+                document.getElementById("temp-val").textContent=parseFloat(last.temperatura).toFixed(1);
+                document.getElementById("humid-val").textContent=parseFloat(last.vlaga).toFixed(1);
+                document.getElementById("time-val").textContent=formatTime(last.vreme);
+            }catch(err){
+                console.error(err);
+            }
+            fetchData();
+            setInterval(fetchData,REFRESH_INTERVAL);
+        }
+    </script>
+</body>
+</html>

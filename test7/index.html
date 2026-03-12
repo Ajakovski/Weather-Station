@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Паметна работна станица – Мониторинг</title>
+  <style>
+    *{box-sizing:border-box; margin: 0px; padding: 0px;}
+    body{
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: rgb(34, 56, 56);
+        color: aliceblue;
+        padding:20px;
+    }
+    header{
+        text-align: center;
+        margin-bottom:30px;
+        padding: 30px 20px 20px;
+        border-bottom:2px solid grey;
+    }
+    header h1{
+        font-size:1.9rem;
+        color:aquamarine;
+    }
+    header p{
+        font-size:0.8rem;
+        color:cornsilk;
+        margin-top:6px;
+    }
+    #status-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #4caf50;
+      box-shadow: 0 0 8px #4caf50;
+      animation: pulse 1.5s infinite;
+      display:flex;
+      flex-wrap:wrap;
+    }
+    #text-dot{
+      font-size:0.6rem;
+      color: darkgrey;
+      display:flex;
+      margin-top: 5px;
+        flex-wrap:wrap;
+    }
+    .cards{
+        display:flex;
+        justify-content:center;
+        gap:25px;
+        flex-wrap:wrap;
+        margin-bottom:30px;
+    }
+    .card{
+        background-color: rgb(0, 0, 162);
+        border: 2px solid rgb(1, 1, 82);
+        padding:28px 40px;
+        text-align:center;
+        border-radius:16px;
+        min-width:250px;
+        transition:box-shadow .3s;
+    }
+
+.card:hover{box-shadow: 0 0 20px rgba(79,195,247,0.15);}
+
+    .card.label{font-size:0.9rem;color: grey; letter-spacing: 1px;}
+    .card.value{font-size:3rem;margin:6px 0px 4px;}
+    .card.unit{color: rgb(95, 95, 95); font-size:1rem;}
+    #temp-val{color: brown;}
+    #humid-val{color:cyan;}
+    #time-val{color:gray; font-size:1.3rem;margin:20px 35px;}
+
+    footer{
+        text-align: center;
+        margin-top: 20px;
+        font-size:0.8rem;
+        color:beige;
+    }
+  </style>
+<body>
+    <header>
+        <h1>Паметна роботна станица</h1>
+        <p>Мониторинг на температура и влага - DHT11</p>
+    </header>
+
+    
+
+    <div class="cards">
+      <div class="card">
+        <div class="label">ТЕМПЕРАТУРА</div>
+        <div class="value" id="temp-val">--</div>
+        <div class="unit">°C</div>
+      </div>
+      <div class="card">
+        <div class="label">ВЛАГА</div>
+        <div class="value" id="humid-val">--</div>
+        <div class="unit">%</div>
+      </div>
+      <div class="card">
+        <div class="label">ПОСЛЕДНО МЕРЕЊЕ</div>
+        <div class="value" id="time-val">--</div>
+        <div class="unit">дата / час</div>
+      </div>
+    </div>
+    <footer>Паметна роботна станица &mdash; Електротехничар за компјутерска техника и автоматика</footer>
+    <div id="status-bar">
+      <div id="status-dot"></div>
+      <div id="text-dot">--</div>
+    </div>
+    <script>
+        const API_URL="save_data.php?action=last";
+        const REFRESH_INTERVAL=5000;
+
+        function setDate(setdateStr){
+            const d= new Date(setdateStr);
+            return d.toLocaleString("mk-MK",{dateStyle:'short',timeStyle:'medium'});
+        }
+        async function fetchData(){
+            try{
+                const res=await fetch(API_URL);
+                const json=await res.json();
+                
+                if (json.status !== "ok" || !json.data.length) {
+                  setStatus(false);
+                  document.getElementById("text-dot").textContent="Проблем со конекција!"
+                  return;
+                }
+                
+                const rows=json.data;
+                const last=rows[rows.length-1];
+
+                document.getElementById("temp-val").textContent=parseFloat(last.temperatura).toFixed(1);
+                document.getElementById("humid-val").textContent=parseFloat(last.vlaga).toFixed(1);
+                document.getElementById("time-val").textContent=setDate(last.vreme);
+
+                setStatus(true);
+                document.getElementById("text-dot").textContent="Успешно поврзување, страницата се освежува на секои 5 секунди!";
+            }catch(err){
+                document.getElementById("text-dot").textContent="Проблем со конекција!"
+                setStatus(false);
+                console.error(err);
+            }
+        }
+        function setStatus(ok) {
+          document.getElementById("status-dot").style.background = ok ? "#4caf50" : "#ef5350";
+        }
+
+        fetchData();
+        setInterval(fetchData,REFRESH_INTERVAL);
+    </script>
+</body>
+</html>

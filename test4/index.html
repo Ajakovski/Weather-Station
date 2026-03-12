@@ -83,18 +83,22 @@
 
     <script>
         const API_URL="save_data.php?action=last";
-        const REFRESH=5000;
+        const REFRESH_INTERVAL=5000;
 
         function formatDate(datetimeStr){
             const d=new Date(datetimeStr);
             return d.toLoacleString("mk-MK");
         }
         async function fetchData(){
-            try{const res=await fetch(API_URL);
+            try{
+            const res=await fetch(API_URL);
             const json=await res.json();
 
-            document.getElemenetById("temp-val").textContent=parseFloat(last.temperatura).toFixed(1);
-            document.getElemenetById("humid-val").textContent=parseFloat(last.vlaga).toFixed(1);
+            const rows = json.data;
+            const last = rows[rows.length - 1];  // Последен запис
+            
+            document.getElementById("temp-val").textContent=parseFloat(last.temperatura).toFixed(1);
+            document.getElementById("humid-val").textContent=parseFloat(last.vlaga).toFixed(1);
             document.getElementById("time-val").textContent=formatDate(last.vreme);
 
             }catch(err){
@@ -102,7 +106,7 @@
             }
         }
         fetchData();
-        setInterval(fetchData,REFRESH);
+        setInterval(fetchData,REFRESH_INTERVAL);
     </script>
 </body>
 </html>

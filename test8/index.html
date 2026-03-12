@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Метеролошка Станица</title>
+    <style>
+        *{box-sizing:border-box;padding:0px;margin:0px;}
+
+        body{
+            background-color: rgb(17, 17, 41);
+            color:azure;
+            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding:20px;
+        }
+        header{
+            text-align:center;
+            padding:30px 20px 20px;
+            margin-bottom:30px;
+            border-bottom:2px solid rgb(19, 19, 104);
+        }
+        header h1{
+            font-size:2rem;
+            color: aquamarine;
+        }
+        header p{
+            font-size:0.9rem;
+            margin-top: 6px;
+            color: rgb(160, 160, 160)
+        }
+
+        .status-bar{
+            display: flex;
+            flex-wrap: wrap;
+            justify-content:center;
+            align-items: center;
+            gap: 10px;
+            margin-top:25px;
+            font-size:0.8rem;
+            color: darkgray;
+        }
+        .status-dot{
+            width:10px; height: 10px;
+            border-radius:50px;
+            background:rgb(0, 184, 0);
+        }
+
+        .cards{
+            display: flex;
+      justify-content: center;
+      gap: 25px;
+      flex-wrap: wrap;
+      margin-bottom: 35px;
+        }
+        .card{
+            background: #162236;
+      border: 1px solid #1e3a5f;
+      border-radius: 16px;
+      padding: 28px 40px;
+      text-align: center;
+      min-width: 200px;
+      transition: box-shadow .3s;
+        }
+        .card:hover{box-shadow: 0 0 15px rgb(145, 145, 145);}
+
+        .card .label{font-size:.9rem;color: gray;}
+        .card .value{font-size:3rem;margin:6px 0px 4px;}
+        .card .unit{font-size:1rem;color: gray;}
+
+        #temp-val{color: brown;}
+        #humid-val{color:cyan;}
+        #time-val{color:lightgreen; font-size:1.3rem;margin:20px 35px;}
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Паметна Роботна Станица</h1>
+        <p>Мониторинг на температура и влага – Arduino DHT11</p>
+    </header>
+    <div class="cards">
+        <div class="card">
+            <div class="label">ТЕМПЕРАТУРА</div>
+            <div class="value" id="temp-val">--</div>
+            <div class="unit">*C</div>
+        </div>
+        <div class="card">
+            <div class="label">ВЛАГА</div>
+            <div class="value" id="humid-val">--</div>
+            <div class="unit">%</div>
+        </div>
+        <div class="card">
+            <div class="label">ВРЕМЕ НА ОТЧИТУВАЊЕ</div>
+            <div class="value" id="time-val">--</div>
+            <div class="unit">Ден / час</div>
+        </div>
+    </div>
+    <footer>&mdash;Електротехничар за Компјутерска Техника и Автоматика</footer>
+    <div class="status-bar">
+        <div class="status-dot"></div>
+        <div class="status-text">--</div>
+    </div>
+
+    <script>
+        const API_URL="save_data.php?action=last";
+        const REFRESH=5000;
+
+        function setDate(setdateStr){
+            const d= new Date(setdateStr);
+            return d.toLocaleString("mk-MK",{dateStyle: 'short',timeStyle: 'short'})
+        }
+
+        async function fetchData(){
+            try{
+                const res=await fetch(API_URL);
+                const json=await res.json();
+
+                if(json.status!=="ok"){
+                    setStatus(false);
+                    document.getElementById("status-text").textContent="Неуспешно поврзување!";
+                    return;
+                }
+
+                const rows=json.data;
+                const last=rows[rows.length-1];
+
+                document.getElementById("temp-val").textContent=toFloat(last.temperatura).toFixed(1);
+                document.getElementById("humid-val").textContent=toFloat(last.vlaga).toFixed(1);
+                document.getElementById("time-val").textContent=setDate(last.vreme);
+
+                setStatus(true);
+                document.getElementById("status-text").textContent="Успешно поврзување, податоците се обновуваат на секои 5 секунди!";
+            }
+            catch(err){
+                setStatus(false);
+                document.getElementById("status-text").textContent="Грешка!";
+                console.error(err);
+            }
+
+            function setStatus(ok){
+                document.getElementById("status-dot").style.background=ok?"green":"red";
+            }
+            fetchData();
+            setInterval(fetchData,REFRESH);
+        }
+    </script>
+</body>
+</html>
