@@ -1,7 +1,8 @@
-import serial
-import requests
+import serial 
+import requests #pip install pyserial requests
 import time
-
+#py -3.14 bridge.py
+#python bridge.py
 # === ПОСТАВКИ — Промени ги ако е потребно ===
 COM_PORT  = "COM4"          # Промени во твојот COM порт (COM3, COM4, COM5...)
 BAUD_RATE = 9600            # Мора да совпаѓа со Arduino кодот
