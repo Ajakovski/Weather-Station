@@ -3,7 +3,8 @@
 // save_data.php - Прием и снимање на сензорски податоци
 // Паметна работна станица - PHP Backend Скрипта
 // =====================================================
-
+// http://localhost/phpmyadmin/
+// http://localhost/monitoring/index.html
 // --- Конфигурација на база на податоци ---
 $db_host = "localhost";
 $db_user = "root";       // Корисник (промени ако е потребно)
